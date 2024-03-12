@@ -41,24 +41,29 @@ jobs:
           pip install -r requirements.txt
           python manage.py test taskManager
 
-  oast:
+  oast-frontend:
     runs-on: ubuntu-20.04
     needs: test
     steps:
       - uses: actions/checkout@v2
 
-      - run: docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt --json > oast-results.json
-        continue-on-error: true             # allow the build to fail, similar to "allow_failure: true" in GitLab
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10.x'
+
+      - run: npm install
+
+      - run: docker run --rm -v $(pwd):/src -w /src hysnsec/retire --outputformat json --outputpath retirejs-report.json --severity high
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Safety
-          path: oast-results.json
+          name: RetireJS
+          path: retirejs-report.json
         if: always()                        # what is this for?
 
   integration:
     runs-on: ubuntu-20.04
-    needs: oast
+    needs: oast-frontend
     steps:
       - run: echo "This is an integration step"
       - run: exit 1
