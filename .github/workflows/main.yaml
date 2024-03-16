@@ -43,6 +43,7 @@ jobs:
 
   odc-backend:
     runs-on: ubuntu-20.04
+    needs: test
     name: depecheck_test
     steps:
       - name: Checkout
