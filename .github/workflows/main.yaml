@@ -49,7 +49,10 @@ jobs:
 
       - run: docker run --rm -v $(pwd):/src hysnsec/bandit -r /src -f json -o /src/bandit-output.json
         continue-on-error: true             # allow the build to fail, similar to allow_failure: true
-
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      - run: python3 upload-results.py --host ${{ secrets.DOJO_HOST }} --api_key ${{ secrets.DOJO_API_TOKEN }} --engagement_id 1 --product_id 1 --lead_id 1 --environment "Production" --result_file bandit-output.json --scanner "Bandit Scan"
       - uses: actions/upload-artifact@v2
         with:
           name: Bandit
